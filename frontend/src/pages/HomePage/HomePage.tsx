@@ -5,22 +5,28 @@ import LoadingButton from '../../lib/components/LoadingButton/LoadingButton'
 import useAppSnackbar from '../../lib/hooks/useAppSnackBar'
 
 const HomePage = () => {
-  const [summarizing, setSummarizing] = useState(false)
-  const [text, setText] = useState('')
+  const [waiting, setWaiting] = useState(false)
+  const [context, setContext] = useState('')
+  const [question, setQuestion] = useState('')
+  const [answer, setAnswer] = useState('')
   const { showSnackbarError } = useAppSnackbar()
-  const [summary, setSummary] = useState('')
 
-  const handleInputChange = (event) => {
-    setText(event.target.value)
+  const handleContextChange = (event) => {
+    setContext(event.target.value)
   }
 
-  const handleSummarize = async () => {
+  const handleQuestionChange = (event) => {
+    setQuestion(event.target.value)
+  }
+
+  const handleAnswering = async () => {
     try {
-      setSummarizing(true)
+      setWaiting(true)
       const response = await axios.post(
-        'http://127.0.0.1:5000/api/summarize',
+        'http://127.0.0.1:5000/api/question-answering',
         {
-          content: text
+          context: context,
+          question: question
         },
         {
           headers: {
@@ -28,11 +34,12 @@ const HomePage = () => {
           }
         }
       )
-      setSummary(response.data.summary_text)
+      setAnswer(response.data.answer)
+      // setAnswer(response.data.summary_text)
     } catch (error) {
       showSnackbarError(error)
     } finally {
-      setSummarizing(false)
+      setWaiting(false)
     }
   }
 
@@ -54,10 +61,11 @@ const HomePage = () => {
 
       <main>
         <section>
-          <Typography variant='h6'>Summarization</Typography>
+          <Typography variant='h6'>Question Answering</Typography>
           <Box
             sx={{
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
               marginBottom: '1rem'
             }}
@@ -65,22 +73,34 @@ const HomePage = () => {
             <TextField
               fullWidth
               multiline
-              value={text}
-              onChange={handleInputChange}
-              placeholder='Nhập đoạn văn...'
+              value={context}
+              onChange={handleContextChange}
+              placeholder='Enter context ...'
               variant='outlined'
               sx={{
                 marginRight: '1rem'
               }}
             />
-            <LoadingButton loading={summarizing} color='primary' variant='contained' onClick={handleSummarize}>
+
+            <TextField
+              fullWidth
+              value={question}
+              onChange={handleQuestionChange}
+              placeholder='Enter question ...'
+              variant='outlined'
+              sx={{
+                marginRight: '1rem'
+              }}
+            />
+
+            <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
               Gửi
             </LoadingButton>
           </Box>
 
           <Box>
-            <Typography variant='h6'>Kết quả tóm tắt:</Typography>
-            <Typography>{summary}</Typography>
+            <Typography variant='h6'>Answer</Typography>
+            <Typography>{answer}</Typography>
           </Box>
         </section>
 
