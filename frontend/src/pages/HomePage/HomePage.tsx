@@ -8,6 +8,7 @@ import {
   createTheme,
   ThemeProvider,
   List,
+  Collapse,
   ListItem,
   ListItemText
 } from '@mui/material'
@@ -15,6 +16,7 @@ import axios from 'axios'
 import LoadingButton from '../../lib/components/LoadingButton/LoadingButton'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
+import Avatar from '@mui/material/Avatar'
 
 const HomePage = () => {
   const [waiting, setWaiting] = useState(false)
@@ -23,6 +25,19 @@ const HomePage = () => {
   const [chatHistory, setChatHistory] = useState([])
   const [darkMode, setDarkMode] = useState(false)
   const chatContainerRef = useRef(null)
+  const [collapsedItems, setCollapsedItems] = useState([])
+
+  const toggleCollapse = (index) => {
+    if (collapsedItems.includes(index)) {
+      setCollapsedItems(collapsedItems.filter((item) => item !== index))
+    } else {
+      setCollapsedItems([...collapsedItems, index])
+    }
+  }
+
+  const isItemCollapsed = (index) => {
+    return collapsedItems.includes(index)
+  }
 
   const handleContextChange = (event) => {
     setContext(event.target.value)
@@ -122,21 +137,62 @@ const HomePage = () => {
         >
           <Box sx={{ padding: '1rem' }}>
             <Typography variant='h4'>Question Answering</Typography>
-            <Button variant='contained' onClick={toggleDarkMode} sx={{ marginTop: '1rem' }}>
-              {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
-            </Button>
           </Box>
 
-          <List component='nav' sx={{ overflowY: 'auto', flex: 1 }}>
-            <ListItem button>
-              <ListItemText primary='Introduce' />
+          <List component='nav'>
+            <ListItem button onClick={() => toggleCollapse(0)}>
+              <ListItemText
+                primary={
+                  <Typography variant='body1' component='div' fontWeight={isItemCollapsed(0) ? 'bold' : 'inherit'}>
+                    Introduce
+                  </Typography>
+                }
+              />
             </ListItem>
-            <ListItem button>
-              <ListItemText primary='About' />
+            <Collapse in={isItemCollapsed(0)} timeout='auto' unmountOnExit>
+              <List component='div' disablePadding>
+                {/* Add specific content for the collapsed item */}
+                <ListItem button>
+                  <ListItemText primary='Introduce Info' />
+                </ListItem>
+              </List>
+            </Collapse>
+
+            <ListItem button onClick={() => toggleCollapse(1)}>
+              <ListItemText
+                primary={
+                  <Typography variant='body1' component='div' fontWeight={isItemCollapsed(1) ? 'bold' : 'inherit'}>
+                    How to use
+                  </Typography>
+                }
+              />
             </ListItem>
-            <ListItem button>
-              <ListItemText primary='Help' />
+            <Collapse in={isItemCollapsed(1)} timeout='auto' unmountOnExit>
+              <List component='div' disablePadding>
+                {/* Add specific content for the collapsed item */}
+                <ListItem button>
+                  <ListItemText primary='About Info' />
+                </ListItem>
+              </List>
+            </Collapse>
+
+            <ListItem button onClick={() => toggleCollapse(2)}>
+              <ListItemText
+                primary={
+                  <Typography variant='body1' component='div' fontWeight={isItemCollapsed(2) ? 'bold' : 'inherit'}>
+                    About us
+                  </Typography>
+                }
+              />
             </ListItem>
+            <Collapse in={isItemCollapsed(2)} timeout='auto' unmountOnExit>
+              <List component='div' disablePadding>
+                {/* Add specific content for the collapsed item */}
+                <ListItem button>
+                  <ListItemText primary='Help Info' />
+                </ListItem>
+              </List>
+            </Collapse>
           </List>
         </Box>
 
@@ -161,14 +217,24 @@ const HomePage = () => {
                   alignItems: 'flex-start'
                 }}
               >
-                <Box sx={{ marginRight: chat.role === 'user' ? '0' : '1rem' }}>
+                <Box
+                  sx={{
+                    marginRight: chat.role === 'user' ? '0' : '1rem',
+                    marginLeft: chat.role === 'user' ? '1rem' : '0'
+                  }}
+                >
+                  <Avatar>{chat.role === 'user' ? 'U' : 'C'}</Avatar>
+                </Box>
+                <Box>
                   <Paper
                     elevation={2}
                     sx={{
                       backgroundColor: chat.role === 'user' ? '#e1f5fe' : '#f3e5f5',
                       padding: '0.5rem',
                       borderRadius: '8px',
-                      color: darkMode ? '#000000' : '#000000'
+                      color: darkMode ? '#000000' : '#000000',
+                      position: 'relative',
+                      display: 'inline-block'
                     }}
                   >
                     <Typography>{chat.content}</Typography>
@@ -177,6 +243,21 @@ const HomePage = () => {
               </Box>
             ))}
           </Box>
+
+          {/* Scroll to bottom button */}
+          {/* <IconButton
+            sx={{
+              position: 'fixed',
+              bottom: '1rem',
+              right: '1rem'
+            }}
+            onClick={() => {
+              if (chatContainerRef.current) {
+                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+              }
+            }}
+          >
+          </IconButton> */}
 
           {/* Footer */}
 
@@ -203,7 +284,10 @@ const HomePage = () => {
           }}
         >
           <Box sx={{ padding: '1rem', borderTop: '1px solid #e0e0e0', flexShrink: 0 }}>
-            <Box sx={{ display: 'flex' }}>
+            <Button variant='contained' onClick={toggleDarkMode} sx={{ marginTop: '1rem' }}>
+              {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
+            </Button>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <input type='file' onChange={handleFileUpload} accept='.txt' />
               <TextField
                 fullWidth
