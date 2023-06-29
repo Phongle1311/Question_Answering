@@ -12,7 +12,8 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-  ListItemIcon
+  ListItemIcon,
+  Tooltip
 } from '@mui/material'
 import axios from 'axios'
 import LoadingButton from '../../lib/components/LoadingButton/LoadingButton'
@@ -348,37 +349,61 @@ const HomePage = () => {
             flexDirection: 'column'
           }}
         >
-          {/* Button */}
-          <Box sx={{ display: 'flex' }}>
-            <Button variant='contained' onClick={toggleDarkMode} sx={{ marginTop: '1rem' }}>
-              {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
-            </Button>
+          {/* Buttons */}
+          <Box sx={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <Tooltip title='New conversation' arrow enterDelay={300} leaveDelay={100}>
+              <Button
+                variant='contained'
+                onClick={() => {
+                  setQuestion('')
+                  setContext('')
+                  setChatHistory([])
+                }}
+                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                <AddIcon />
+              </Button>
+            </Tooltip>
 
-            <Button variant='contained' component='label'>
-              <UploadFileIcon />
-              <input type='file' hidden onChange={handleFileUpload} accept='.txt' />
-            </Button>
+            <Tooltip title='Upload File' arrow enterDelay={300} leaveDelay={100}>
+              <Button
+                variant='contained'
+                component='label'
+                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                <UploadFileIcon />
+                <input type='file' hidden onChange={handleFileUpload} accept='.txt' />
+              </Button>
+            </Tooltip>
 
-            <Button
-              variant='contained'
-              onClick={(e) => {
-                console.log(e)
-              }}
-              sx={{ marginTop: '1rem' }}
+            <Tooltip title='Copy' arrow enterDelay={300} leaveDelay={100}>
+              <Button
+                variant='contained'
+                onClick={(e) => {
+                  console.log(e)
+                }}
+                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                <ContentCopyIcon />
+              </Button>
+            </Tooltip>
+
+            <Tooltip
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              arrow
+              enterDelay={300}
+              leaveDelay={100}
             >
-              <AddIcon />
-            </Button>
-
-            <Button
-              variant='contained'
-              onClick={(e) => {
-                console.log(e)
-              }}
-              sx={{ marginTop: '1rem' }}
-            >
-              <ContentCopyIcon />
-            </Button>
+              <Button
+                variant='contained'
+                onClick={toggleDarkMode}
+                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
+              </Button>
+            </Tooltip>
           </Box>
+
           <TextField
             fullWidth
             multiline
