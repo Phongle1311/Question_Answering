@@ -1,20 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
-import {
-  Box,
-  Typography,
-  TextField,
-  Paper,
-  Button,
-  createTheme,
-  ThemeProvider,
-  List,
-  ListItem,
-  ListItemText
-} from '@mui/material'
+import { Box, Typography, TextField, Paper, Button, createTheme, ThemeProvider } from '@mui/material'
 import axios from 'axios'
 import LoadingButton from '../../lib/components/LoadingButton/LoadingButton'
-import DarkModeIcon from '@mui/icons-material/DarkMode'
-import LightModeIcon from '@mui/icons-material/LightMode'
 
 const HomePage = () => {
   const [waiting, setWaiting] = useState(false)
@@ -111,43 +98,24 @@ const HomePage = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: '100vh' }}>
-        {/* Left Sidebar */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {/* Header */}
         <Box
           sx={{
-            width: '25%',
-            backgroundColor: darkMode ? 'rgb(32, 33, 35)' : 'rgba(0, 0, 0, 0.08)',
-            color: darkMode ? '#ffffff' : '#000000'
+            backgroundColor: darkMode ? '#212121' : '#f5f5f5',
+            color: darkMode ? '#ffffff' : '#000000',
+            padding: '1rem'
           }}
         >
-          <Box sx={{ padding: '1rem' }}>
-            <Typography variant='h4'>Question Answering</Typography>
-            <Button variant='contained' onClick={toggleDarkMode} sx={{ marginTop: '1rem' }}>
-              {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
-            </Button>
-          </Box>
-
-          <List component='nav' sx={{ overflowY: 'auto', flex: 1 }}>
-            <ListItem button>
-              <ListItemText primary='Introduce' />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary='About' />
-            </ListItem>
-            <ListItem button>
-              <ListItemText primary='Help' />
-            </ListItem>
-          </List>
+          <Typography variant='h4'>WebApp Demo</Typography>
+          <Button variant='contained' onClick={toggleDarkMode}>
+            {darkMode ? 'Light Mode' : 'Dark Mode'}
+          </Button>
         </Box>
 
-        {/* Main Content - Conversation */}
+        {/* Main Content */}
         <Box
-          sx={{
-            backgroundColor: darkMode ? 'rgb(68, 70, 84)' : '#f5f5f5',
-            width: '55%',
-            display: 'flex',
-            flexDirection: 'column'
-          }}
+          sx={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: darkMode ? '#333333' : '#f5f5f5' }}
         >
           {/* Chat Container */}
           <Box sx={{ flex: 1, padding: '1rem', overflowY: 'auto' }} ref={chatContainerRef}>
@@ -179,29 +147,6 @@ const HomePage = () => {
           </Box>
 
           {/* Footer */}
-
-          <Box sx={{ display: 'flex', marginTop: '1rem' }}>
-            <TextField
-              fullWidth
-              value={question}
-              onChange={handleQuestionChange}
-              placeholder='Enter question ...'
-              variant='outlined'
-            />
-            <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
-              Gửi
-            </LoadingButton>
-          </Box>
-        </Box>
-
-        {/* Right Sidebar */}
-        <Box
-          sx={{
-            width: '20%',
-            backgroundColor: darkMode ? 'rgb(32, 33, 35)' : 'rgba(0, 0, 0, 0.08)',
-            color: darkMode ? '#ffffff' : '#000000'
-          }}
-        >
           <Box sx={{ padding: '1rem', borderTop: '1px solid #e0e0e0', flexShrink: 0 }}>
             <Box sx={{ display: 'flex' }}>
               <input type='file' onChange={handleFileUpload} accept='.txt' />
@@ -215,14 +160,19 @@ const HomePage = () => {
                 sx={{ marginRight: '1rem' }}
               />
             </Box>
-            {/* Add additional buttons as needed */}
-            <Button variant='contained' sx={{ marginTop: '1rem' }}>
-              Delete All
-            </Button>
-            <Button variant='contained' sx={{ marginTop: '1rem' }}>
-              Copy
-            </Button>
-            {/* Add additional buttons as needed */}
+
+            <Box sx={{ display: 'flex', marginTop: '1rem' }}>
+              <TextField
+                fullWidth
+                value={question}
+                onChange={handleQuestionChange}
+                placeholder='Enter question ...'
+                variant='outlined'
+              />
+              <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
+                Gửi
+              </LoadingButton>
+            </Box>
           </Box>
         </Box>
       </Box>
