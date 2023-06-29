@@ -10,13 +10,25 @@ import {
   List,
   Collapse,
   ListItem,
-  ListItemText
+  ListItemText,
+  IconButton,
+  ListItemIcon
 } from '@mui/material'
 import axios from 'axios'
 import LoadingButton from '../../lib/components/LoadingButton/LoadingButton'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import Avatar from '@mui/material/Avatar'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import SendIcon from '@mui/icons-material/Send'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import AddIcon from '@mui/icons-material/Add'
+import SmartToyIcon from '@mui/icons-material/SmartToy'
+import FaceIcon from '@mui/icons-material/Face'
+import EmailIcon from '@mui/icons-material/Email'
+import GitHubIcon from '@mui/icons-material/GitHub'
+import FacebookIcon from '@mui/icons-material/Facebook'
 
 const HomePage = () => {
   const [waiting, setWaiting] = useState(false)
@@ -24,8 +36,9 @@ const HomePage = () => {
   const [question, setQuestion] = useState('')
   const [chatHistory, setChatHistory] = useState([])
   const [darkMode, setDarkMode] = useState(false)
-  const chatContainerRef = useRef(null)
   const [collapsedItems, setCollapsedItems] = useState([])
+  const [showScrollButton, setShowScrollButton] = useState(false)
+  const chatContainerRef = useRef(null)
 
   const toggleCollapse = (index) => {
     if (collapsedItems.includes(index)) {
@@ -150,7 +163,7 @@ const HomePage = () => {
               />
             </ListItem>
             <Collapse in={isItemCollapsed(0)} timeout='auto' unmountOnExit>
-              <List component='div' disablePadding>
+              <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
                 {/* Add specific content for the collapsed item */}
                 <ListItem button>
                   <ListItemText primary='Introduce Info' />
@@ -168,10 +181,10 @@ const HomePage = () => {
               />
             </ListItem>
             <Collapse in={isItemCollapsed(1)} timeout='auto' unmountOnExit>
-              <List component='div' disablePadding>
+              <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
                 {/* Add specific content for the collapsed item */}
                 <ListItem button>
-                  <ListItemText primary='About Info' />
+                  <ListItemText primary='Help Info' />
                 </ListItem>
               </List>
             </Collapse>
@@ -186,10 +199,32 @@ const HomePage = () => {
               />
             </ListItem>
             <Collapse in={isItemCollapsed(2)} timeout='auto' unmountOnExit>
-              <List component='div' disablePadding>
-                {/* Add specific content for the collapsed item */}
-                <ListItem button>
-                  <ListItemText primary='Help Info' />
+              <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
+                <ListItem>
+                  <ListItemText primary='Lê Hoài Phong' />
+                </ListItem>
+                <ListItem>
+                  <ListItemText primary='Đỗ Trung Hiếu' />
+                </ListItem>
+                <ListItem>
+                  <ListItemText secondary='FIT - HCMUS' />
+                </ListItem>
+                <ListItem>
+                  <ListItemIcon>
+                    <a href='mailto:hoaiphong13.11.2002@gmail.com' target='_blank' rel='noopener noreferrer'>
+                      <EmailIcon />
+                    </a>
+                  </ListItemIcon>
+                  <ListItemIcon>
+                    <a href='https://github.com/PhongLe1311' target='_blank' rel='noopener noreferrer'>
+                      <GitHubIcon />
+                    </a>
+                  </ListItemIcon>
+                  <ListItemIcon>
+                    <a href='https://www.facebook.com/lehoaiphongIT/' target='_blank' rel='noopener noreferrer'>
+                      <FacebookIcon />
+                    </a>
+                  </ListItemIcon>
                 </ListItem>
               </List>
             </Collapse>
@@ -206,7 +241,17 @@ const HomePage = () => {
           }}
         >
           {/* Chat Container */}
-          <Box sx={{ flex: 1, padding: '1rem', overflowY: 'auto' }} ref={chatContainerRef}>
+          <Box
+            sx={{ flex: 1, padding: '1rem', overflowY: 'scroll', maxHeight: 600 }}
+            onScroll={() => {
+              const container = chatContainerRef.current
+              if (container) {
+                const { scrollTop, scrollHeight, clientHeight } = container
+                setShowScrollButton(scrollTop + clientHeight < scrollHeight)
+              }
+            }}
+            ref={chatContainerRef}
+          >
             {chatHistory.map((chat, index) => (
               <Box
                 key={index}
@@ -223,7 +268,9 @@ const HomePage = () => {
                     marginLeft: chat.role === 'user' ? '1rem' : '0'
                   }}
                 >
-                  <Avatar>{chat.role === 'user' ? 'U' : 'C'}</Avatar>
+                  <Avatar sx={{ bgcolor: chat.role === 'user' ? 'green' : 'blue', boxShadow: '1px 2px 9px #F4AAB9' }}>
+                    {chat.role === 'user' ? <FaceIcon /> : <SmartToyIcon />}
+                  </Avatar>
                 </Box>
                 <Box>
                   <Paper
@@ -244,24 +291,19 @@ const HomePage = () => {
             ))}
           </Box>
 
-          {/* Scroll to bottom button */}
-          {/* <IconButton
-            sx={{
-              position: 'fixed',
-              bottom: '1rem',
-              right: '1rem'
-            }}
-            onClick={() => {
-              if (chatContainerRef.current) {
-                chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-              }
-            }}
-          >
-          </IconButton> */}
-
           {/* Footer */}
 
-          <Box sx={{ display: 'flex', marginTop: '1rem' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              marginTop: '1rem',
+              gap: '1rem',
+              paddingLeft: '1rem',
+              paddingRight: '1rem',
+              position: 'relative',
+              alignItems: 'center'
+            }}
+          >
             <TextField
               fullWidth
               value={question}
@@ -269,9 +311,28 @@ const HomePage = () => {
               placeholder='Enter question ...'
               variant='outlined'
             />
-            <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
-              Gửi
-            </LoadingButton>
+            <Box sx={{ display: 'flex', paddingTop: '15px', paddingBottom: '15px' }}>
+              <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
+                <SendIcon />
+              </LoadingButton>
+            </Box>
+            {/* Scroll to bottom button */}
+            {showScrollButton && (
+              <IconButton
+                sx={{
+                  position: 'absolute',
+                  top: '-3rem',
+                  right: '1rem'
+                }}
+                onClick={() => {
+                  if (chatContainerRef.current) {
+                    chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
+                  }
+                }}
+              >
+                <ArrowDownwardIcon />
+              </IconButton>
+            )}
           </Box>
         </Box>
 
@@ -280,34 +341,54 @@ const HomePage = () => {
           sx={{
             width: '20%',
             backgroundColor: darkMode ? 'rgb(32, 33, 35)' : 'rgba(0, 0, 0, 0.08)',
-            color: darkMode ? '#ffffff' : '#000000'
+            color: darkMode ? '#ffffff' : '#000000',
+            padding: '1rem',
+            borderTop: '1px solid #e0e0e0',
+            flexShrink: 0,
+            flexDirection: 'column'
           }}
         >
-          <Box sx={{ padding: '1rem', borderTop: '1px solid #e0e0e0', flexShrink: 0 }}>
+          {/* Button */}
+          <Box sx={{ display: 'flex' }}>
             <Button variant='contained' onClick={toggleDarkMode} sx={{ marginTop: '1rem' }}>
               {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
             </Button>
-            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-              <input type='file' onChange={handleFileUpload} accept='.txt' />
-              <TextField
-                fullWidth
-                multiline
-                value={context}
-                onChange={handleContextChange}
-                placeholder='Enter context ...'
-                variant='outlined'
-                sx={{ marginRight: '1rem' }}
-              />
-            </Box>
-            {/* Add additional buttons as needed */}
-            <Button variant='contained' sx={{ marginTop: '1rem' }}>
-              Delete All
+
+            <Button variant='contained' component='label'>
+              <UploadFileIcon />
+              <input type='file' hidden onChange={handleFileUpload} accept='.txt' />
             </Button>
-            <Button variant='contained' sx={{ marginTop: '1rem' }}>
-              Copy
+
+            <Button
+              variant='contained'
+              onClick={(e) => {
+                console.log(e)
+              }}
+              sx={{ marginTop: '1rem' }}
+            >
+              <AddIcon />
             </Button>
-            {/* Add additional buttons as needed */}
+
+            <Button
+              variant='contained'
+              onClick={(e) => {
+                console.log(e)
+              }}
+              sx={{ marginTop: '1rem' }}
+            >
+              <ContentCopyIcon />
+            </Button>
           </Box>
+          <TextField
+            fullWidth
+            multiline
+            value={context}
+            onChange={handleContextChange}
+            placeholder='Enter context ...'
+            variant='outlined'
+            sx={{ marginRight: '1rem' }}
+            maxRows={14}
+          />
         </Box>
       </Box>
     </ThemeProvider>
