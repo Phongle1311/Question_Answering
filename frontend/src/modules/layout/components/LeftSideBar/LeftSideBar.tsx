@@ -37,7 +37,7 @@ const LeftSideBar = ({
         <Typography variant='h4'>Question Answering</Typography>
       </Box>
 
-      <List component='nav'>
+      <List component='nav' sx={{ maxHeight: '80vh', overflowY: 'scroll' }}>
         <ListItem button onClick={() => toggleCollapse(0)}>
           <ListItemText
             primary={
@@ -50,8 +50,19 @@ const LeftSideBar = ({
         <Collapse in={isItemCollapsed(0)} timeout='auto' unmountOnExit>
           <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
             {/* Add specific content for the collapsed item */}
-            <ListItem button>
-              <ListItemText primary='Introduce Info' />
+            <ListItem>
+              <ListItemText primary='This is a learning project on the topic of the Transformer model. We retrain DistilBERT on SQuADv1 to solve Question Answering problem.' />
+            </ListItem>
+            <ListItem button sx={{ display: 'flex', justifyContent: 'center' }}>
+              <img
+                src='https://siamcomputing.com/wp-content/uploads/2022/05/Chatbot.png'
+                width='200px'
+                height='200px'
+                alt='chatbot'
+              />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary='Question Answering models can retrieve the answer to a question from a given text, which is useful for searching for an answer in a document. Some question answering models can generate answers without context!' />
             </ListItem>
           </List>
         </Collapse>
@@ -68,8 +79,20 @@ const LeftSideBar = ({
         <Collapse in={isItemCollapsed(1)} timeout='auto' unmountOnExit>
           <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
             {/* Add specific content for the collapsed item */}
-            <ListItem button>
-              <ListItemText primary='Help Info' />
+            <ListItem>
+              <ListItemText primary='You need to enter both context and question.' />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary='You can also have multiple questions for one context.' />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary='You can upload a file text for the context!' />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary='There is another beautiful use-case: change to url mode and enter link to website you want to ask about! ' />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary='You can change light mode to dark mode and reverse' />
             </ListItem>
           </List>
         </Collapse>

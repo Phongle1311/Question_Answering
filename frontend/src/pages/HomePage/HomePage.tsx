@@ -142,7 +142,7 @@ const HomePage = () => {
         <Box
           sx={{
             backgroundColor: darkMode ? 'rgb(68, 70, 84)' : '#f5f5f5',
-            width: '55%',
+            width: '60%',
             display: 'flex',
             flexDirection: 'column'
           }}
@@ -248,7 +248,7 @@ const HomePage = () => {
         {/* Right Sidebar */}
         <Box
           sx={{
-            width: '20%',
+            width: '15%',
             backgroundColor: darkMode ? 'rgb(32, 33, 35)' : 'rgba(0, 0, 0, 0.08)',
             color: darkMode ? '#ffffff' : '#000000',
             padding: '1rem',
