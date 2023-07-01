@@ -20,6 +20,9 @@ import SendIcon from '@mui/icons-material/Send'
 import SmartToyIcon from '@mui/icons-material/SmartToy'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import FaceIcon from '@mui/icons-material/Face'
+import LinkIcon from '@mui/icons-material/Link'
+import AbcIcon from '@mui/icons-material/Abc'
+import SettingsIcon from '@mui/icons-material/Settings'
 import LeftSideBar from '../../modules/layout/components/LeftSideBar/LeftSideBar'
 import UploadFileButton from '../../lib/components/UploadFileButton/UploadFileButton'
 import useAppSnackbar from '../../lib/hooks/useAppSnackBar'
@@ -34,6 +37,7 @@ const HomePage = () => {
   const [chatHistory, setChatHistory] = useState([])
   const [darkMode, setDarkMode] = useState(false)
   const [showScrollButton, setShowScrollButton] = useState(false)
+  const [urlMode, setUrlMode] = useState(false)
   const chatContainerRef = useRef(null)
   const { showSnackbarSuccess, showSnackbarError } = useAppSnackbar()
 
@@ -53,11 +57,11 @@ const HomePage = () => {
     try {
       setWaiting(true)
 
-      if (context === '' || context === undefined) {
+      if ((urlMode && url === '') || (!urlMode && context === '')) {
         showSnackbarError('You need to fill context first!')
         return
       }
-      if (question === '' || question === undefined) {
+      if (question === '') {
         showSnackbarError("The question mustn't is empty")
         return
       }
@@ -68,7 +72,7 @@ const HomePage = () => {
           context: context,
           question: question,
           url: url,
-          type: 'plain text'
+          type: urlMode ? 'url' : 'plain text'
         },
         {
           headers: {
@@ -77,13 +81,11 @@ const HomePage = () => {
         }
       )
 
-      console.log(currentContext)
-      console.log(context)
-      if (context !== currentContext) {
-        setCurrentContext(context)
+      if ((urlMode && url !== currentContext) || (!urlMode && context !== currentContext)) {
+        setCurrentContext(urlMode ? url : context)
         const newContext = {
           role: 'user',
-          content: context
+          content: urlMode ? url : context
         }
         setChatHistory((prevChatHistory) => [...prevChatHistory, newContext])
       }
@@ -100,6 +102,7 @@ const HomePage = () => {
       setChatHistory((prevChatHistory) => [...prevChatHistory, newChat, newAnswer])
       setQuestion('')
     } catch (error) {
+      showSnackbarError('Error:' + error.toString())
       console.log('Error:', error)
     } finally {
       setWaiting(false)
@@ -255,8 +258,8 @@ const HomePage = () => {
           }}
         >
           {/* Buttons */}
-          <Box sx={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <Tooltip title='Clear conversation' arrow enterDelay={300} leaveDelay={100}>
+          <Box sx={{ display: 'flex', gap: '1rem', marginBottom: '1rem', justifyContent: 'space-between' }}>
+            <Tooltip title='Clear conversation' placement='top' arrow enterDelay={300} leaveDelay={100}>
               <Button
                 variant='contained'
                 onClick={() => {
@@ -264,9 +267,51 @@ const HomePage = () => {
                   setContext('')
                   setChatHistory([])
                 }}
-                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+                sx={{ marginTop: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
               >
                 <DeleteForeverIcon />
+              </Button>
+            </Tooltip>
+
+            <Tooltip title='Settings' placement='top' arrow enterDelay={300} leaveDelay={100}>
+              <Button
+                variant='contained'
+                onClick={() => {
+                  showSnackbarSuccess('Coming soon! maybe :)')
+                }}
+                sx={{ marginTop: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                <SettingsIcon />
+              </Button>
+            </Tooltip>
+
+            <Tooltip
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              placement='top'
+              arrow
+              enterDelay={300}
+              leaveDelay={100}
+            >
+              <Button
+                variant='contained'
+                onClick={toggleDarkMode}
+                sx={{ marginTop: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
+              </Button>
+            </Tooltip>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: '1rem', marginBottom: '1rem', justifyContent: 'space-between' }}>
+            <Tooltip title='Url Mode' arrow enterDelay={300} leaveDelay={100}>
+              <Button
+                variant='contained'
+                onClick={() => {
+                  setUrlMode(!urlMode)
+                }}
+                sx={{ marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              >
+                {urlMode ? <LinkIcon /> : <AbcIcon />}
               </Button>
             </Tooltip>
 
@@ -280,45 +325,31 @@ const HomePage = () => {
             </Tooltip>
 
             <CopyToClipboardButton
-              text={context}
-              sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+              text={urlMode ? url : context}
+              sx={{ marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
             />
-
-            <Tooltip
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              arrow
-              enterDelay={300}
-              leaveDelay={100}
-            >
-              <Button
-                variant='contained'
-                onClick={toggleDarkMode}
-                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
-              >
-                {darkMode ? <DarkModeIcon /> : <LightModeIcon />}
-              </Button>
-            </Tooltip>
           </Box>
-
-          <TextField
-            fullWidth
-            multiline
-            value={context}
-            onChange={handleContextChange}
-            placeholder='Enter context ...'
-            variant='outlined'
-            sx={{ marginRight: '1rem' }}
-            maxRows={14}
-          />
-
-          <TextField
-            fullWidth
-            value={url}
-            onChange={handleUrlChange}
-            placeholder='You can enter url to a website ...'
-            variant='outlined'
-            sx={{ marginRight: '1rem' }}
-          />
+          {urlMode ? (
+            <TextField
+              fullWidth
+              value={url}
+              onChange={handleUrlChange}
+              placeholder='You can enter url to a website ...'
+              variant='outlined'
+              sx={{ marginRight: '1rem' }}
+            />
+          ) : (
+            <TextField
+              fullWidth
+              multiline
+              value={context}
+              onChange={handleContextChange}
+              placeholder='Enter context ...'
+              variant='outlined'
+              sx={{ marginRight: '1rem' }}
+              maxRows={18}
+            />
+          )}
         </Box>
       </Box>
     </ThemeProvider>

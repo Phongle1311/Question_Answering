@@ -1,4 +1,5 @@
 from Model import Model
+from ExtractUrl import extractContentFromURL
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
@@ -17,7 +18,13 @@ def question_answering():
     if request.method == "POST":
         try:
             data = request.get_json()
-            context = data.get("context")
+            type = data.get("type")
+            context = ""
+            if type == "url":
+                url = data.get("url")
+                context = extractContentFromURL(url)
+            else:
+                context = data.get("context")
             question = data.get("question")
 
             if context is None or question is None:

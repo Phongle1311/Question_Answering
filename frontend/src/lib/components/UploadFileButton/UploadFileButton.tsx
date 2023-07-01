@@ -30,7 +30,7 @@ const UploadFileButton = ({ onLoad }: { onLoad: (arg: string) => void }) => {
     <Button
       variant='contained'
       component='label'
-      sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+      sx={{ marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
     >
       <UploadFileIcon />
       <input type='file' hidden onChange={handleFileUpload} accept='.txt' />
