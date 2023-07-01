@@ -7,12 +7,7 @@ import {
   Button,
   createTheme,
   ThemeProvider,
-  List,
-  Collapse,
-  ListItem,
-  ListItemText,
   IconButton,
-  ListItemIcon,
   Tooltip
 } from '@mui/material'
 import axios from 'axios'
@@ -22,36 +17,25 @@ import LightModeIcon from '@mui/icons-material/LightMode'
 import Avatar from '@mui/material/Avatar'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import SendIcon from '@mui/icons-material/Send'
-import UploadFileIcon from '@mui/icons-material/UploadFile'
-import ContentCopyIcon from '@mui/icons-material/ContentCopy'
-import AddIcon from '@mui/icons-material/Add'
 import SmartToyIcon from '@mui/icons-material/SmartToy'
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import FaceIcon from '@mui/icons-material/Face'
-import EmailIcon from '@mui/icons-material/Email'
-import GitHubIcon from '@mui/icons-material/GitHub'
-import FacebookIcon from '@mui/icons-material/Facebook'
+import LeftSideBar from '../../modules/layout/components/LeftSideBar/LeftSideBar'
+import UploadFileButton from '../../lib/components/UploadFileButton/UploadFileButton'
+import useAppSnackbar from '../../lib/hooks/useAppSnackBar'
+import CopyToClipboardButton from '../../lib/components/CopyToClipboardButton/CopyToClipboardButton'
 
 const HomePage = () => {
   const [waiting, setWaiting] = useState(false)
   const [context, setContext] = useState('')
+  const [currentContext, setCurrentContext] = useState('')
   const [question, setQuestion] = useState('')
+  const [url, setUrl] = useState('')
   const [chatHistory, setChatHistory] = useState([])
   const [darkMode, setDarkMode] = useState(false)
-  const [collapsedItems, setCollapsedItems] = useState([])
   const [showScrollButton, setShowScrollButton] = useState(false)
   const chatContainerRef = useRef(null)
-
-  const toggleCollapse = (index) => {
-    if (collapsedItems.includes(index)) {
-      setCollapsedItems(collapsedItems.filter((item) => item !== index))
-    } else {
-      setCollapsedItems([...collapsedItems, index])
-    }
-  }
-
-  const isItemCollapsed = (index) => {
-    return collapsedItems.includes(index)
-  }
+  const { showSnackbarSuccess, showSnackbarError } = useAppSnackbar()
 
   const handleContextChange = (event) => {
     setContext(event.target.value)
@@ -61,14 +45,30 @@ const HomePage = () => {
     setQuestion(event.target.value)
   }
 
+  const handleUrlChange = (event) => {
+    setUrl(event.target.value)
+  }
+
   const handleAnswering = async () => {
     try {
       setWaiting(true)
+
+      if (context === '' || context === undefined) {
+        showSnackbarError('You need to fill context first!')
+        return
+      }
+      if (question === '' || question === undefined) {
+        showSnackbarError("The question mustn't is empty")
+        return
+      }
+
       const response = await axios.post(
         'http://127.0.0.1:5000/api/question-answering',
         {
           context: context,
-          question: question
+          question: question,
+          url: url,
+          type: 'plain text'
         },
         {
           headers: {
@@ -76,6 +76,18 @@ const HomePage = () => {
           }
         }
       )
+
+      console.log(currentContext)
+      console.log(context)
+      if (context !== currentContext) {
+        setCurrentContext(context)
+        const newContext = {
+          role: 'user',
+          content: context
+        }
+        setChatHistory((prevChatHistory) => [...prevChatHistory, newContext])
+      }
+
       const answer = response.data.answer
       const newChat = {
         role: 'user',
@@ -91,27 +103,6 @@ const HomePage = () => {
       console.log('Error:', error)
     } finally {
       setWaiting(false)
-    }
-  }
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0]
-
-    // Check if file size exceeds the limit (e.g., 5MB)
-    const fileSizeLimit = 5 * 1024 * 1024 // 5MB in bytes
-    if (file.size > fileSizeLimit) {
-      // Show an error message or notification to the user
-      console.log('File size exceeds the limit.')
-      return
-    }
-
-    const reader = new FileReader()
-    reader.readAsText(file)
-    reader.onload = () => {
-      setContext(reader.result.toString())
-    }
-    reader.onerror = () => {
-      console.log('Error on reading file: ', reader.error)
     }
   }
 
@@ -142,95 +133,7 @@ const HomePage = () => {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex', flexDirection: 'row', minHeight: '100vh' }}>
         {/* Left Sidebar */}
-        <Box
-          sx={{
-            width: '25%',
-            backgroundColor: darkMode ? 'rgb(32, 33, 35)' : 'rgba(0, 0, 0, 0.08)',
-            color: darkMode ? '#ffffff' : '#000000'
-          }}
-        >
-          <Box sx={{ padding: '1rem' }}>
-            <Typography variant='h4'>Question Answering</Typography>
-          </Box>
-
-          <List component='nav'>
-            <ListItem button onClick={() => toggleCollapse(0)}>
-              <ListItemText
-                primary={
-                  <Typography variant='body1' component='div' fontWeight={isItemCollapsed(0) ? 'bold' : 'inherit'}>
-                    Introduce
-                  </Typography>
-                }
-              />
-            </ListItem>
-            <Collapse in={isItemCollapsed(0)} timeout='auto' unmountOnExit>
-              <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
-                {/* Add specific content for the collapsed item */}
-                <ListItem button>
-                  <ListItemText primary='Introduce Info' />
-                </ListItem>
-              </List>
-            </Collapse>
-
-            <ListItem button onClick={() => toggleCollapse(1)}>
-              <ListItemText
-                primary={
-                  <Typography variant='body1' component='div' fontWeight={isItemCollapsed(1) ? 'bold' : 'inherit'}>
-                    How to use
-                  </Typography>
-                }
-              />
-            </ListItem>
-            <Collapse in={isItemCollapsed(1)} timeout='auto' unmountOnExit>
-              <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
-                {/* Add specific content for the collapsed item */}
-                <ListItem button>
-                  <ListItemText primary='Help Info' />
-                </ListItem>
-              </List>
-            </Collapse>
-
-            <ListItem button onClick={() => toggleCollapse(2)}>
-              <ListItemText
-                primary={
-                  <Typography variant='body1' component='div' fontWeight={isItemCollapsed(2) ? 'bold' : 'inherit'}>
-                    About us
-                  </Typography>
-                }
-              />
-            </ListItem>
-            <Collapse in={isItemCollapsed(2)} timeout='auto' unmountOnExit>
-              <List component='div' disablePadding sx={{ paddingLeft: '10px' }}>
-                <ListItem>
-                  <ListItemText primary='Lê Hoài Phong' />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary='Đỗ Trung Hiếu' />
-                </ListItem>
-                <ListItem>
-                  <ListItemText secondary='FIT - HCMUS' />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <a href='mailto:hoaiphong13.11.2002@gmail.com' target='_blank' rel='noopener noreferrer'>
-                      <EmailIcon />
-                    </a>
-                  </ListItemIcon>
-                  <ListItemIcon>
-                    <a href='https://github.com/PhongLe1311' target='_blank' rel='noopener noreferrer'>
-                      <GitHubIcon />
-                    </a>
-                  </ListItemIcon>
-                  <ListItemIcon>
-                    <a href='https://www.facebook.com/lehoaiphongIT/' target='_blank' rel='noopener noreferrer'>
-                      <FacebookIcon />
-                    </a>
-                  </ListItemIcon>
-                </ListItem>
-              </List>
-            </Collapse>
-          </List>
-        </Box>
+        <LeftSideBar darkMode={darkMode} />
 
         {/* Main Content - Conversation */}
         <Box
@@ -313,9 +216,11 @@ const HomePage = () => {
               variant='outlined'
             />
             <Box sx={{ display: 'flex', paddingTop: '15px', paddingBottom: '15px' }}>
-              <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
-                <SendIcon />
-              </LoadingButton>
+              <Tooltip title='Submit' arrow enterDelay={300} leaveDelay={100}>
+                <LoadingButton loading={waiting} color='primary' variant='contained' onClick={handleAnswering}>
+                  <SendIcon />
+                </LoadingButton>
+              </Tooltip>
             </Box>
             {/* Scroll to bottom button */}
             {showScrollButton && (
@@ -351,7 +256,7 @@ const HomePage = () => {
         >
           {/* Buttons */}
           <Box sx={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <Tooltip title='New conversation' arrow enterDelay={300} leaveDelay={100}>
+            <Tooltip title='Clear conversation' arrow enterDelay={300} leaveDelay={100}>
               <Button
                 variant='contained'
                 onClick={() => {
@@ -361,32 +266,23 @@ const HomePage = () => {
                 }}
                 sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
               >
-                <AddIcon />
+                <DeleteForeverIcon />
               </Button>
             </Tooltip>
 
             <Tooltip title='Upload File' arrow enterDelay={300} leaveDelay={100}>
-              <Button
-                variant='contained'
-                component='label'
-                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
-              >
-                <UploadFileIcon />
-                <input type='file' hidden onChange={handleFileUpload} accept='.txt' />
-              </Button>
+              <UploadFileButton
+                onLoad={(context) => {
+                  showSnackbarSuccess('Load file successfully!')
+                  setContext(context)
+                }}
+              />
             </Tooltip>
 
-            <Tooltip title='Copy' arrow enterDelay={300} leaveDelay={100}>
-              <Button
-                variant='contained'
-                onClick={(e) => {
-                  console.log(e)
-                }}
-                sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
-              >
-                <ContentCopyIcon />
-              </Button>
-            </Tooltip>
+            <CopyToClipboardButton
+              text={context}
+              sx={{ marginTop: '1rem', marginBottom: '1rem', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)' }}
+            />
 
             <Tooltip
               title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
@@ -413,6 +309,15 @@ const HomePage = () => {
             variant='outlined'
             sx={{ marginRight: '1rem' }}
             maxRows={14}
+          />
+
+          <TextField
+            fullWidth
+            value={url}
+            onChange={handleUrlChange}
+            placeholder='You can enter url to a website ...'
+            variant='outlined'
+            sx={{ marginRight: '1rem' }}
           />
         </Box>
       </Box>
