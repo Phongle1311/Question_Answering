@@ -39,9 +39,9 @@ The model’s performance is evaluated using:
 
 - **Exact Match (EM)**: Measures the percentage of predictions that exactly match any of the ground-truth answers. It is defined as:
   
-  \[
+  $$
   \text{EM} = \frac{\text{Number of exact matches}}{\text{Total number of samples}}
-  \]
+  $$
 
 - **F1-Score**: Evaluates the model’s precision and recall. It is calculated as:
 
