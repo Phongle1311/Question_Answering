@@ -45,19 +45,19 @@ The model’s performance is evaluated using:
 
 - **F1-Score**: Evaluates the model’s precision and recall. It is calculated as:
 
-  \[
+  $$
   \text{F1-score} = \frac{2 \times \text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}
-  \]
+  $$
 
   Where:
 
-  \[
+  $$
   \text{Precision} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}
-  \]
+  $$
 
-  \[
+  $$
   \text{Recall} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}
-  \]
+  $$
 
 ### Results
 
